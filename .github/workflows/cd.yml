@@ -1,0 +1,117 @@
+name: Node.js CD
+
+on:
+  workflow_run:
+    workflows: ["Node.js CI"]
+    branches: [main]
+    types: [completed]
+
+jobs:
+  build-and-push-image:
+    if: ${{ github.event.workflow_run.conclusion == 'success' }}
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3
+        
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v2
+        
+      - name: Login to Docker Hub
+        uses: docker/login-action@v2
+        with:
+          username: ${{ secrets.DOCKERHUB_USERNAME }}
+          password: ${{ secrets.DOCKERHUB_TOKEN }}
+          
+      - name: Extract metadata for Docker
+        id: meta
+        uses: docker/metadata-action@v4
+        with:
+          images: ${{ secrets.DOCKERHUB_USERNAME }}/hello-world-nodejs
+          tags: |
+            type=sha,format=short
+            type=ref,event=branch
+            latest
+            
+      - name: Build and push Docker image
+        uses: docker/build-push-action@v4
+        with:
+          context: .
+          file: ./infrastructure/docker/Dockerfile
+          push: true
+          tags: ${{ steps.meta.outputs.tags }}
+          labels: ${{ steps.meta.outputs.labels }}
+    outputs:
+      image: ${{ steps.meta.outputs.tags }}
+          
+  deploy-to-dev:
+    runs-on: ubuntu-latest
+    needs: [build-and-push-image]
+    environment:
+      name: development
+      url: http://dev-hello-world.example.com
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3
+        
+      - name: Deploy to development environment
+        run: echo "Deploying to development environment"
+        
+      - name: Update docker-compose.yml with image tag
+        run: sed -i 's|image: hello-world-nodejs:latest|image: ${{ needs.build-and-push-image.outputs.image }}|g' ./infrastructure/docker/docker-compose.yml
+        
+      - name: Deploy using docker-compose
+        run: echo "docker-compose -f ./infrastructure/docker/docker-compose.yml up -d"
+        
+      - name: Health check
+        run: sleep 10 && curl -f http://localhost:3000/hello || exit 1
+        
+  deploy-to-test:
+    runs-on: ubuntu-latest
+    needs: [deploy-to-dev, build-and-push-image]
+    environment:
+      name: test
+      url: http://test-hello-world.example.com
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3
+        
+      - name: Deploy to test environment
+        run: echo "Deploying to test environment"
+        
+      - name: Update docker-compose.yml with image tag
+        run: sed -i 's|image: hello-world-nodejs:latest|image: ${{ needs.build-and-push-image.outputs.image }}|g' ./infrastructure/docker/docker-compose.yml
+        
+      - name: Deploy using docker-compose
+        run: echo "docker-compose -f ./infrastructure/docker/docker-compose.yml up -d"
+        
+      - name: Run integration tests
+        run: cd src/backend && npm ci && npm run test:integration
+        
+      - name: Health check
+        run: sleep 10 && curl -f http://localhost:3000/hello || exit 1
+        
+  deploy-to-production:
+    runs-on: ubuntu-latest
+    needs: [deploy-to-test, build-and-push-image]
+    environment:
+      name: production
+      url: http://hello-world.example.com
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3
+        
+      - name: Deploy to production environment
+        run: echo "Deploying to production environment"
+        
+      - name: Update docker-compose.yml with image tag
+        run: sed -i 's|image: hello-world-nodejs:latest|image: ${{ needs.build-and-push-image.outputs.image }}|g' ./infrastructure/docker/docker-compose.yml
+        
+      - name: Deploy using docker-compose
+        run: echo "docker-compose -f ./infrastructure/docker/docker-compose.yml up -d"
+        
+      - name: Health check
+        run: sleep 10 && curl -f http://localhost:3000/hello || exit 1
+        
+      - name: Notify deployment success
+        run: echo "Deployment to production successful"
