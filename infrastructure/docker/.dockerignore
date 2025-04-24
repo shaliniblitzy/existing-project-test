@@ -1,0 +1,42 @@
+# Node.js Hello World .dockerignore
+# Excludes unnecessary files from Docker build context to optimize image size and build performance
+
+# Dependencies
+node_modules
+npm-debug.log
+
+# Version Control
+.git
+.github
+.gitignore
+
+# Documentation
+*.md
+CHANGELOG.md
+CONTRIBUTING.md
+LICENSE
+src/backend/docs
+
+# Testing
+src/backend/__tests__
+src/backend/jest.config.js
+coverage
+
+# Development
+src/backend/.eslintrc.js
+src/backend/.prettierrc
+src/backend/nodemon.json
+
+# Infrastructure
+infrastructure/terraform
+infrastructure/docker/docker-compose.yml
+
+# Configuration
+.env*
+
+# Logs
+*.log
+
+# System Files
+.DS_Store
+Thumbs.db
