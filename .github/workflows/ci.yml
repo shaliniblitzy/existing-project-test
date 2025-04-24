@@ -1,0 +1,45 @@
+name: Node.js CI
+
+on:
+  pull_request:
+    branches: [ main ]
+  push:
+    branches: [ main ]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v3
+      
+    - name: Set up Node.js
+      uses: actions/setup-node@v3
+      with:
+        node-version: '18.x'
+        cache: 'npm'
+        cache-dependency-path: 'src/backend/package.json'
+        
+    - name: Install dependencies
+      working-directory: src/backend
+      run: npm ci
+      
+    - name: Run linting
+      working-directory: src/backend
+      run: npm run lint
+      
+    - name: Run tests
+      working-directory: src/backend
+      run: npm test
+      
+    - name: Generate code coverage report
+      working-directory: src/backend
+      run: npm run coverage
+      
+    - name: Upload code coverage report
+      uses: actions/upload-artifact@v3
+      if: always()
+      with:
+        name: coverage-report
+        path: src/backend/coverage
