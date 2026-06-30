@@ -1,20 +1,72 @@
-# Project metadata and tooling configuration for the Python 3 / Flask backend.
-# Runtime/dev dependencies are managed via requirements.txt / requirements-dev.txt
-# (the canonical install path used by the Dockerfile and CI). This file intentionally
-# omits a [build-system] table because the application is run from source via
-# `gunicorn wsgi:app`, not installed as a distributable package.
+# pyproject.toml — Project metadata and tooling configuration for the
+# Python 3 / Flask backend, migrated from the original Node.js HTTP server.
+#
+# This single file assumes the responsibilities of two retired artifacts:
+#   * project metadata that formerly lived in package.json
+#       (name, version, description, license)
+#   * the test-runner configuration that formerly lived in jest.config.js
+#       (now expressed as the pytest configuration below)
+#
+# Dependency *installation* remains driven by requirements.txt /
+# requirements-dev.txt — the canonical install path used by the Dockerfile and
+# the CI/CD pipelines. The runtime dependencies mirrored under [project] below
+# are kept byte-for-byte identical to requirements.txt and exist purely for
+# project-metadata completeness.
+
+[build-system]
+requires = ["setuptools>=68"]
+build-backend = "setuptools.build_meta"
 
 [project]
-name = "backend"
-version = "1.0.0"
-description = "Python 3 / Flask rewrite of the Node.js Hello World HTTP server, preserving all original functionality"
+# Python-appropriate distribution name (the former package was named
+# "node-hello-world"; the "node" prefix is intentionally dropped).
+name = "hello-world-flask"
+# Bumped to 2.0.0 to mark the major Node.js -> Python/Flask migration
+# (the prior package.json declared 1.0.0).
+version = "2.0.0"
+description = "A simple Python/Flask HTTP server exposing /hello and /health, migrated from Node.js."
+# The application targets Python 3.12 (Flask 3.1 itself supports 3.9+).
 requires-python = ">=3.12"
+# MIT license preserved from the original package.json.
 license = { text = "MIT" }
+# Author intentionally left as an empty placeholder, mirroring the empty
+# "author" field of the original package.json.
+authors = [{ name = "" }]
+# Runtime dependencies mirrored from requirements.txt for metadata
+# completeness. requirements.txt remains the authoritative install source;
+# these pins MUST stay identical to it.
+dependencies = [
+    "Flask==3.1.3",
+    "Werkzeug==3.1.8",
+    "gunicorn==26.0.0",
+    "python-dotenv==1.2.2",
+]
 
+# ---------------------------------------------------------------------------
+# pytest configuration (supersedes the former jest.config.js).
+#
+# The retired JavaScript suite discovered files via the glob '**/*.test.js';
+# the Python suite uses pytest's conventional "test_*" discovery rooted at the
+# tests/ package. "testpaths" MUST point at "tests" so that `pytest`, invoked
+# from src/backend (matching the CI working-directory), discovers the ported
+# parity suite.
+#
+# No coverage "addopts" are configured on purpose: pytest-cov is intentionally
+# absent from the pinned dependency set, so the configuration stays fully
+# runnable with only pytest + pytest-flask installed.
+# ---------------------------------------------------------------------------
 [tool.pytest.ini_options]
-minversion = "9.0"
 testpaths = ["tests"]
-addopts = "-ra -q"
 python_files = ["test_*.py"]
 python_classes = ["Test*"]
 python_functions = ["test_*"]
+
+# ---------------------------------------------------------------------------
+# Optional lint/format configuration (a lightweight stand-in for the retired
+# ESLint + Prettier setup). This table is minimal and non-failing: ruff is not
+# part of the pinned dependency set, so the section is inert unless a developer
+# chooses to run ruff locally.
+# ---------------------------------------------------------------------------
+[tool.ruff]
+line-length = 100
+target-version = "py312"
