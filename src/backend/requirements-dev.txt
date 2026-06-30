@@ -1,16 +1,18 @@
-# Development & test dependencies for the Python 3 / Flask rewrite.
-# Installs the runtime requirements plus the test toolchain (replaces Jest + SuperTest).
-# Versions pinned per Technical Specification (AAP) Section 0.4 and verified installable on PyPI.
-
 -r requirements.txt
 
-# Test runner (replaces Jest).
+# Development & test dependencies for the Python 3 / Flask rewrite of the
+# Hello World HTTP server. Installing this file
+# (`pip install -r requirements-dev.txt`) pulls in the pinned runtime
+# requirements above PLUS the test toolchain below, provisioning a complete
+# dev/test environment in a single step. This supersedes the retired Node
+# devDependencies (jest, supertest, eslint, prettier, nodemon).
+#
+# Versions are EXACT pins per Technical Specification (AAP) Section 0.4 and are
+# verified installable from PyPI. Target interpreter: Python 3.12.
+
+# Test runner - replaces Jest as the parity / unit / integration framework.
 pytest==9.1.1
 
-# Pytest fixtures for Flask apps (Flask's built-in test_client is also used).
+# Pytest fixtures for Flask apps. The ported integration suite also uses
+# Flask's built-in test_client directly. Replaces SuperTest.
 pytest-flask==1.3.0
-
-# Optional: only needed if live-HTTP integration tests are added. The Flask
-# test_client is preferred and normally makes this unnecessary, but it is
-# included so the warmed environment supports either testing approach.
-requests==2.34.2
