@@ -1,0 +1,20 @@
+# Project metadata and tooling configuration for the Python 3 / Flask backend.
+# Runtime/dev dependencies are managed via requirements.txt / requirements-dev.txt
+# (the canonical install path used by the Dockerfile and CI). This file intentionally
+# omits a [build-system] table because the application is run from source via
+# `gunicorn wsgi:app`, not installed as a distributable package.
+
+[project]
+name = "backend"
+version = "1.0.0"
+description = "Python 3 / Flask rewrite of the Node.js Hello World HTTP server, preserving all original functionality"
+requires-python = ">=3.12"
+license = { text = "MIT" }
+
+[tool.pytest.ini_options]
+minversion = "9.0"
+testpaths = ["tests"]
+addopts = "-ra -q"
+python_files = ["test_*.py"]
+python_classes = ["Test*"]
+python_functions = ["test_*"]

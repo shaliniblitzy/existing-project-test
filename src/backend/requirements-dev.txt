@@ -1,0 +1,16 @@
+# Development & test dependencies for the Python 3 / Flask rewrite.
+# Installs the runtime requirements plus the test toolchain (replaces Jest + SuperTest).
+# Versions pinned per Technical Specification (AAP) Section 0.4 and verified installable on PyPI.
+
+-r requirements.txt
+
+# Test runner (replaces Jest).
+pytest==9.1.1
+
+# Pytest fixtures for Flask apps (Flask's built-in test_client is also used).
+pytest-flask==1.3.0
+
+# Optional: only needed if live-HTTP integration tests are added. The Flask
+# test_client is preferred and normally makes this unnecessary, but it is
+# included so the warmed environment supports either testing approach.
+requests==2.34.2
