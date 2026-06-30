@@ -25,9 +25,13 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 - All Node.js source modules under `src/backend/` (replaced by the Flask `app/` package) and the vestigial Express route modules.
 
 ### Preserved (behavioral parity)
-- `GET /hello` → `200` `text/plain` `Hello world`; non-GET `/hello` → `405 Method Not Allowed`.
-- `GET /health` → `200` `application/json` health payload `{status, uptime, memory, metrics}`.
-- `404 Not Found`, `405 Method Not Allowed`, `500 Internal Server Error` returned as `text/plain`.
+The external HTTP contract is preserved exactly — identical status codes, content types, response bodies, and headers across all seven scenarios:
+- `GET /hello` → `200`, `Content-Type: text/plain`, body `Hello world`.
+- Non-GET `/hello` (any method other than GET) → `405`, `Content-Type: text/plain`, body `Method Not Allowed`.
+- `GET /health` → `200`, `Content-Type: application/json`, body `{status:"ok", uptime, memory:{rss,heapTotal,heapUsed,external}, metrics:{requestCount,errorCount}}`.
+- Non-GET `/health` (any method other than GET) → `405`, `Content-Type: text/plain`, body `Method Not Allowed`.
+- Unmatched route → `404`, `Content-Type: text/plain`, body `Not Found`.
+- Unhandled exception → `500`, `Content-Type: text/plain`, body `Internal Server Error`.
 - Four security headers on every response: `X-Content-Type-Options: nosniff`, `X-Frame-Options: DENY`, `Content-Security-Policy: default-src 'none'`, `Cache-Control: no-store`.
 - Default port `3000`; environment-variable-driven configuration.
 
