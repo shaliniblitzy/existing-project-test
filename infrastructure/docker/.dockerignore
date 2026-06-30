@@ -1,9 +1,18 @@
-# Node.js Hello World .dockerignore
+# Python/Flask Hello World .dockerignore
 # Excludes unnecessary files from Docker build context to optimize image size and build performance
 
-# Dependencies
-node_modules
-npm-debug.log
+# Dependencies & Virtual Environments
+.venv/
+venv/
+
+# Python Bytecode & Caches
+__pycache__/
+*.pyc
+*.pyo
+.pytest_cache/
+.ruff_cache/
+.mypy_cache/
+*.egg-info/
 
 # Version Control
 .git
@@ -18,14 +27,8 @@ LICENSE
 src/backend/docs
 
 # Testing
-src/backend/__tests__
-src/backend/jest.config.js
+src/backend/tests
 coverage
-
-# Development
-src/backend/.eslintrc.js
-src/backend/.prettierrc
-src/backend/nodemon.json
 
 # Infrastructure
 infrastructure/terraform

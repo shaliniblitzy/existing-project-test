@@ -24,7 +24,7 @@ variable "instance_type" {
   }
 }
 
-# Application port for the Node.js Hello World server
+# Application port for the Python/Flask Hello World server
 variable "port" {
   description = "Application port"
   type        = number

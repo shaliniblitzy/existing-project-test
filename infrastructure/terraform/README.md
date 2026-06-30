@@ -1,6 +1,6 @@
-# Node.js Hello World - Terraform Infrastructure
+# Python/Flask Hello World - Terraform Infrastructure
 
-This directory contains Terraform configuration files to deploy the Node.js Hello World application to AWS infrastructure.
+This directory contains Terraform configuration files to deploy the Python/Flask Hello World application to AWS infrastructure.
 
 ## Prerequisites
 
@@ -16,7 +16,7 @@ This Terraform configuration deploys the following AWS resources:
 
 - EC2 instance (t2.micro by default) running Amazon Linux 2
 - Security group allowing HTTP traffic on port 80 and the application port (default: 3000)
-- User data script to install Node.js, clone the repository, and set up the application as a service
+- User data script that installs Python 3.12 and pip, clones the repository, installs the Python dependencies, and runs the application with Gunicorn as a systemd service (named `hello-world`)
 
 ## Configuration
 
@@ -138,4 +138,5 @@ If you encounter issues with the deployment:
 
 - [Terraform AWS Provider Documentation](https://registry.terraform.io/providers/hashicorp/aws/latest/docs)
 - [Amazon EC2 Documentation](https://docs.aws.amazon.com/ec2/)
-- [Node.js Documentation](https://nodejs.org/en/docs/)
+- [Flask Documentation](https://flask.palletsprojects.com/)
+- [Python Documentation](https://docs.python.org/3/)
